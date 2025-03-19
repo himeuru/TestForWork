@@ -10,11 +10,11 @@ definitions:
         type: integer
       link:
         type: string
-      lyrics:
-        type: string
       release_date:
         type: string
       song:
+        type: string
+      text:
         type: string
       updated_at:
         type: string
@@ -134,11 +134,11 @@ paths:
       summary: Update song
       tags:
       - songs
-  /songs/{id}/lyrics:
+  /songs/{id}/text:
     get:
       consumes:
       - application/json
-      description: Get paginated song lyrics
+      description: Get paginated song text
       parameters:
       - description: Song ID
         in: path
@@ -164,7 +164,7 @@ paths:
             items:
               type: string
             type: array
-      summary: Get lyrics
+      summary: Get text
       tags:
       - songs
 swagger: "2.0"

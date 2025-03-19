@@ -169,9 +169,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/songs/{id}/lyrics": {
+        "/songs/{id}/text": {
             "get": {
-                "description": "Get paginated song lyrics",
+                "description": "Get paginated song text",
                 "consumes": [
                     "application/json"
                 ],
@@ -181,7 +181,7 @@ const docTemplate = `{
                 "tags": [
                     "songs"
                 ],
-                "summary": "Get lyrics",
+                "summary": "Get text",
                 "parameters": [
                     {
                         "type": "integer",
@@ -235,13 +235,13 @@ const docTemplate = `{
                 "link": {
                     "type": "string"
                 },
-                "lyrics": {
-                    "type": "string"
-                },
                 "release_date": {
                     "type": "string"
                 },
                 "song": {
+                    "type": "string"
+                },
+                "text": {
                     "type": "string"
                 },
                 "updated_at": {
