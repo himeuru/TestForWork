@@ -1,0 +1,170 @@
+basePath: /
+definitions:
+  models.Song:
+    properties:
+      created_at:
+        type: string
+      group:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      lyrics:
+        type: string
+      release_date:
+        type: string
+      song:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.SongRequest:
+    properties:
+      group:
+        type: string
+      song:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Music API
+  version: "1.0"
+paths:
+  /songs:
+    get:
+      consumes:
+      - application/json
+      description: Get songs with filtering and pagination
+      parameters:
+      - description: Group filter
+        in: query
+        name: group
+        type: string
+      - description: Song filter
+        in: query
+        name: song
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+      summary: Get songs
+      tags:
+      - songs
+    post:
+      consumes:
+      - application/json
+      description: Add new song
+      parameters:
+      - description: Song data
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Song'
+      summary: Add song
+      tags:
+      - songs
+  /songs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a song
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete song
+      tags:
+      - songs
+    put:
+      consumes:
+      - application/json
+      description: Update song details
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Song data
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Song'
+      summary: Update song
+      tags:
+      - songs
+  /songs/{id}/lyrics:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated song lyrics
+      parameters:
+      - description: Song ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get lyrics
+      tags:
+      - songs
+swagger: "2.0"
