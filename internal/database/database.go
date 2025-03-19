@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"log"
-	"strings"
 	"testForWork/internal/config"
 	"time"
 )
@@ -60,15 +59,21 @@ func createDatabaseIfNotExists(cfg config.DBConfig) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = db.ExecContext(ctx,
-		fmt.Sprintf("SELECT 1 FROM pg_database WHERE database_name = '%s'", cfg.DatabaseName))
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname=$1)"
+	err = db.QueryRowContext(ctx, query, cfg.DatabaseName).Scan(&exists)
+	if err != nil {
+		log.Fatalf("failed to connect database: %v", err)
+	}
 
-	if err != nil && strings.Contains(err.Error(), "does not exist") {
+	if exists {
+		log.Println("there is no database", cfg.DatabaseName)
+	} else {
 		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", cfg.DatabaseName))
 		if err != nil {
-			return fmt.Errorf("failed to create database: %w", err)
+			log.Fatalf("failed on creating database: %v", err)
 		}
-		log.Printf("Database %s created", cfg.DatabaseName)
+		log.Printf("database successfully created", cfg.DatabaseName)
 	}
 	return nil
 }
