@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS songs (
                                      group_name TEXT NOT NULL,
                                      song_name TEXT NOT NULL,
                                      release_date DATE NOT NULL,
-                                     lyrics TEXT NOT NULL,
+                                     text TEXT NOT NULL,
                                      link TEXT NOT NULL,
                                      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

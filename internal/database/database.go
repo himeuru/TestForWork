@@ -61,7 +61,7 @@ func createDatabaseIfNotExists(cfg config.DBConfig) error {
 	defer cancel()
 
 	_, err = db.ExecContext(ctx,
-		fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname = '%s'", cfg.DatabaseName))
+		fmt.Sprintf("SELECT 1 FROM pg_database WHERE database_name = '%s'", cfg.DatabaseName))
 
 	if err != nil && strings.Contains(err.Error(), "does not exist") {
 		_, err = db.ExecContext(ctx, fmt.Sprintf("CREATE DATABASE %s", cfg.DatabaseName))

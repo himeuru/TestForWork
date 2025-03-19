@@ -83,7 +83,7 @@ GET /songs?group=Muse&song_name=Black&page=1&limit=10
 
 - Получение текста песни с пагинацией по куплетам:
 ```
-GET /songs/{id}/lyrics?page=1&limit=3
+GET /songs/{id}/text?page=1&limit=3
 ```
 
 - Добавление новой песни:

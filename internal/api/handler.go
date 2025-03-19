@@ -60,8 +60,8 @@ func (handler *Handler) getSongs(writer http.ResponseWriter, router *http.Reques
 	json.NewEncoder(writer).Encode(songs)
 }
 
-// @Summary Get lyrics
-// @Description Get paginated song lyrics
+// @Summary Get text
+// @Description Get paginated song text
 // @Tags songs
 // @Accept json
 // @Produce json
@@ -69,8 +69,8 @@ func (handler *Handler) getSongs(writer http.ResponseWriter, router *http.Reques
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
 // @Success 200 {array} string
-// @Router /songs/{id}/lyrics [get]
-func (handler *Handler) getLyrics(writer http.ResponseWriter, router *http.Request) {
+// @Router /songs/{id}/text [get]
+func (handler *Handler) getText(writer http.ResponseWriter, router *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(router, "id"))
 
 	page, _ := strconv.Atoi(router.URL.Query().Get("page"))
@@ -83,20 +83,20 @@ func (handler *Handler) getLyrics(writer http.ResponseWriter, router *http.Reque
 		limit = 10
 	}
 
-	lyrics, err := handler.service.GetLyrics(id, page, limit)
+	text, err := handler.service.GetText(id, page, limit)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(writer, "Song not found", http.StatusNotFound)
 			return
 		}
 
-		log.Printf("Error getting lyrics: %s\n", err)
+		log.Printf("Error getting text: %s\n", err)
 		http.Error(writer, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode(lyrics)
+	json.NewEncoder(writer).Encode(text)
 }
 
 // @Summary Add song
@@ -191,7 +191,7 @@ func (handler *Handler) Routes() chi.Router {
 		r.Get("/", handler.getSongs)
 		r.Post("/", handler.addSong)
 		r.Route("/{id}", func(r chi.Router) {
-			r.Get("/lyrics", handler.getLyrics)
+			r.Get("/text", handler.getText)
 			r.Put("/", handler.updateSong)
 			r.Delete("/", handler.deleteSong)
 		})

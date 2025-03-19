@@ -52,14 +52,14 @@ func (service *Service) CreateSong(group, song string) (*models.Song, error) {
 	}
 
 	query := `INSERT INTO songs 
-    			("group_name", "song_name", "release_date", "lyrics", "link") 
+    			("group_name", "song_name", "release_date", "text", "link") 
 			  VALUES 
 			    ($1, $2, $3, $4, $5) 
 			  RETURNING id, created_at, updated_at`
 
 	var newSong models.Song
 	err = service.db.QueryRowContext(
-		context.Background(), query, group, song, releaseDate, details.Lyrics, details.Link,
+		context.Background(), query, group, song, releaseDate, details.Text, details.Link,
 	).Scan(
 		&newSong.ID, &newSong.CreatedAt, &newSong.UpdatedAt,
 	)
@@ -71,7 +71,7 @@ func (service *Service) CreateSong(group, song string) (*models.Song, error) {
 	newSong.Group = group
 	newSong.Song = song
 	newSong.ReleaseDate = releaseDate
-	newSong.Lyrics = details.Lyrics
+	newSong.Text = details.Text
 	newSong.Link = details.Link
 
 	log.Printf("Created new song : %d", newSong)
@@ -80,7 +80,7 @@ func (service *Service) CreateSong(group, song string) (*models.Song, error) {
 
 func (service *Service) GetSongs(group, song string, page int, limit int) ([]models.Song, error) {
 	offset, query := (page-1)*limit, `
-		SELECT id, group_name, song_name, release_date, lyrics, link, created_at, updated_at 
+		SELECT id, group_name, song_name, release_date, text, link, created_at, updated_at 
 		FROM songs
 		WHERE ($1 = '' OR group_name = $1) AND ($2 = '' OR song_name = $2) LIMIT $3 OFFSET $4`
 
@@ -98,7 +98,7 @@ func (service *Service) GetSongs(group, song string, page int, limit int) ([]mod
 			&song.Group,
 			&song.Song,
 			&song.ReleaseDate,
-			&song.Lyrics,
+			&song.Text,
 			&song.Link,
 			&song.CreatedAt,
 			&song.UpdatedAt,
@@ -111,15 +111,15 @@ func (service *Service) GetSongs(group, song string, page int, limit int) ([]mod
 	return songs, nil
 }
 
-func (service *Service) GetLyrics(id, page, limit int) ([]string, error) {
-	query := `SELECT lyrics FROM songs WHERE id=$1`
-	var lyrics string
-	err := service.db.QueryRowContext(context.Background(), query, id).Scan(&lyrics)
+func (service *Service) GetText(id, page, limit int) ([]string, error) {
+	query := `SELECT text FROM songs WHERE id=$1`
+	var text string
+	err := service.db.QueryRowContext(context.Background(), query, id).Scan(&text)
 	if err != nil {
 		return nil, err
 	}
 
-	verses := strings.Split(lyrics, "\n\n")
+	verses := strings.Split(text, "\n\n")
 	start := (page - 1) * limit
 	end := start + limit
 
@@ -162,9 +162,9 @@ func (service *Service) UpdateSong(id int, req models.SongUpdateRequest) (*model
 		params = append(params, rd)
 		counter++
 	}
-	if req.Lyrics != nil {
-		updates = append(updates, fmt.Sprintf("lyrics = $%d", counter))
-		params = append(params, *req.Lyrics)
+	if req.Text != nil {
+		updates = append(updates, fmt.Sprintf("text = $%d", counter))
+		params = append(params, *req.Text)
 		counter++
 	}
 	if req.Link != nil {
@@ -191,7 +191,7 @@ func (service *Service) UpdateSong(id int, req models.SongUpdateRequest) (*model
 		&updatedSong.Group,
 		&updatedSong.Song,
 		&updatedSong.ReleaseDate,
-		&updatedSong.Lyrics,
+		&updatedSong.Text,
 		&updatedSong.Link,
 		&updatedSong.CreatedAt,
 		&updatedSong.UpdatedAt,
@@ -223,7 +223,7 @@ func (service *Service) DeleteSong(id int) error {
 func (service *Service) generateLocalDetails(group, song string) *models.SongDetail {
 	return &models.SongDetail{
 		ReleaseDate: time.Now().Format("2006-01-02"),
-		Lyrics:      "Lyrics placeholder for " + song,
+		Text:        "Text placeholder for " + song,
 		Link:        fmt.Sprintf("https://example.com/%s/%s", group, song),
 	}
 }
@@ -261,7 +261,7 @@ func (service *Service) fetchSongDetails(group, song string) (*models.SongDetail
 }
 
 func (service *Service) GetSongByID(id int) (*models.Song, error) {
-	query := `SELECT id, group_name, song_name, release_date, lyrics, link, created_at, updated_at FROM songs WHERE id = $1`
+	query := `SELECT id, group_name, song_name, release_date, text, link, created_at, updated_at FROM songs WHERE id = $1`
 
 	var song models.Song
 	err := service.db.QueryRow(query, id).Scan(
@@ -269,7 +269,7 @@ func (service *Service) GetSongByID(id int) (*models.Song, error) {
 		&song.Group,
 		&song.Song,
 		&song.ReleaseDate,
-		&song.Lyrics,
+		&song.Text,
 		&song.Link,
 		&song.CreatedAt,
 		&song.UpdatedAt,
